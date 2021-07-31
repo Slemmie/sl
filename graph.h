@@ -41,7 +41,7 @@ public:
 		assert(from >= 0 && from < size && to >= 0 && to < size);
 		int ind = edges.size();
 		g[from].push_back(ind);
-		edges.push_back(Edge(from, to, weight));
+		edges.push_back({ from, to, weight });
 		return ind;
 	}
 	
