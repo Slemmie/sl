@@ -22,7 +22,7 @@ public:
 		assert(ind < size - 1);
 		g[from].push_back(ind);
 		g[to].push_back(ind);
-		edges.push_back({ from, to, weight });
+		edges.emplace_back(from, to, weight);
 		return ind;
 	}
 	
