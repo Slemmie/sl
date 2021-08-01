@@ -20,8 +20,11 @@ std::string get_file(int argc, char** argv, const std::string& which) {
 	std::string result = "[not found]";
 	for (int i = 0; i < argc; i++) {
 		std::string s = std::string(argv[i]);
-		if (s.length() > which.length() && s.substr(0, which.length()) == which) {
+		if (s.length() >= which.length() && s.substr(0, which.length()) == which) {
 			result = s.substr(which.length());
+			if (result.empty() && i + 1 != argc) {
+				result = std::string(argv[i + 1]);
+			}
 		}
 	}
 	return result;
