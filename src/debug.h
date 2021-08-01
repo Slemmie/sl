@@ -1,16 +1,8 @@
 #pragma once
 
-//-//
-
 #include <bits/extc++.h>
 
-using namespace __gnu_pbds;
-
-template <typename A, typename B = std::less <A>> using ordered_set =
-tree <A, null_type, B, rb_tree_tag, tree_order_statistics_node_update>;
-
-template <typename A, typename B, typename C = std::less <A>> using ordered_map =
-tree <A, B, C, rb_tree_tag, tree_order_statistics_node_update>;
+//-//
 
 template <typename A> std::string bs(A x, int digs) {
 	std::string r(digs, '0');
@@ -54,8 +46,8 @@ namespace dbg_pr {
 	template <typename A> std::string to_string(const std::stack <A>& stck);
 	template <typename A> std::string to_string(const std::deque <A>& q);
 	template <typename A, size_t size> std::string to_string(const std::array <A, size>& a);
-	template <typename A, typename B> std::string to_string(const ordered_set <A, B>& st);
-	template <typename A, typename B, typename C> std::string to_string(const ordered_map <A, B, C>& mp);
+	template <typename A, typename B> std::string to_string(const __gnu_pbds::tree <A, __gnu_pbds::null_type, B, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>& st);
+	template <typename A, typename B, typename C> std::string to_string(const __gnu_pbds::tree <A, B, C, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>& mp);
 	
 	std::string to_string(const std::string& s) {
 		return '"' + s + '"';
@@ -268,7 +260,7 @@ namespace dbg_pr {
 		return ret;
 	}
 	
-	template <typename A, typename B> std::string to_string(const ordered_set <A, B>& st) {
+	template <typename A, typename B> std::string to_string(const __gnu_pbds::tree <A, __gnu_pbds::null_type, B, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>& st) {
 		if (st.empty()) {
 			return "[ ]";
 		}
@@ -279,7 +271,7 @@ namespace dbg_pr {
 		return ret;
 	}
 	
-	template <typename A, typename B, typename C> std::string to_string(const ordered_map <A, B, C>& mp) {
+	template <typename A, typename B, typename C> std::string to_string(const __gnu_pbds::tree <A, B, C, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>& mp) {
 		if (mp.empty()) {
 			return "[ ]";
 		}
