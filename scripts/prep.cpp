@@ -147,12 +147,6 @@ int main(int argc, char** argv) {
 	
 	load_std_libs();
 	
-	std::ofstream ouf(ou_file);
-	if (!ouf.is_open()) {
-		std::cerr << "fatal: failed to open file '" << ou_file << "'" << std::endl;
-		exit(0);
-	}
-	
 	std::cerr << "interpreting..." << std::endl;
 	
 	std::set <std::string> tmp;
@@ -174,6 +168,12 @@ int main(int argc, char** argv) {
 		}
 	} else {
 		to_swap = finished;
+	}
+	
+	std::ofstream ouf(ou_file);
+	if (!ouf.is_open()) {
+		std::cerr << "fatal: failed to open file '" << ou_file << "'" << std::endl;
+		exit(0);
 	}
 	
 	ouf << to_swap;
