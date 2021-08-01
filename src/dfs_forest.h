@@ -15,7 +15,7 @@ public:
 	std::vector <int> par_node, par_edge, pre, post, order, sub, root, dep;
 	std::vector <A> dist;
 	
-	Dfs_forest(int _size, bool _init = true) :
+	Dfs_forest(int _size, bool _init = false) :
 	Forest <A> (_size)
 	{ 
 		if (_init) {
