@@ -106,8 +106,12 @@ bool no_sl_include, std::set <std::string>& already_included, int argc, char** a
 					continue;
 				}
 			}
-			if (!is_pref("#include <sl/", s) && !already_included.count(incl_file)) {
-				already_included.insert(incl_file);
+			if (!is_pref("#include <sl/", s)) {
+				if (already_included.count(incl_file)) {
+					continue;
+				} else {
+					already_included.insert(incl_file);
+				}
 			}
 		}
 		if (is_pref("#include <sl/", s)) {
