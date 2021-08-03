@@ -7,3 +7,4 @@ export:
 	cp scripts/prep* /usr/local/include/sl/scripts
 	cp scripts/copy_template* /usr/local/include/sl/scripts
 	cp scripts/std_libs /usr/local/include/sl/scripts
+	cp scripts/ignore_lines /usr/local/include/sl/scripts
