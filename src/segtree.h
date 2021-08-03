@@ -9,7 +9,7 @@ template <typename A, typename APPLY_ARG> class Segtree {
 	
 public:
 	
-	int size;
+	int size, n_size;
 	std::vector <A> v;
 	std::function <A(const A&, const A&)> merge;
 	std::function <void(A&, const APPLY_ARG&)> apply;
@@ -17,6 +17,7 @@ public:
 	Segtree(int _size,
 	const std::function <A(const A&, const A&)>& _merge,
 	const std::function <void(A&, const APPLY_ARG&)>& _apply) :
+	n_size(_size),
 	merge(_merge),
 	apply(_apply)
 	{
@@ -32,6 +33,7 @@ public:
 	template <typename B> Segtree(const std::vector <B>& u,
 	const std::function <A(const A&, const A&)>& _merge,
 	const std::function <void(A&, const APPLY_ARG&)>& _apply) :
+	n_size(u.size()),
 	merge(_merge),
 	apply(_apply)
 	{
@@ -47,6 +49,7 @@ public:
 	template <typename B> Segtree(int _size, const std::vector <B>& u,
 	const std::function <A(const A&, const A&)>& _merge,
 	const std::function <void(A&, const APPLY_ARG&)>& _apply) :
+	n_size(_size),
 	merge(_merge),
 	apply(_apply)
 	{
@@ -78,7 +81,7 @@ public:
 	}
 	
 	A query() {
-		return v[0];
+		return query(0, n_size);
 	}
 	
 	int find_first(int l, int r, const std::function <bool(const A&)>& check) {
