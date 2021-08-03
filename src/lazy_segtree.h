@@ -9,7 +9,7 @@ template <typename A, typename APPLY_ARG> class Lazy_segtree {
 	
 public:
 	
-	int size;
+	int size, n_size;
 	std::vector <A> v;
 	std::function <A(const A&, const A&)> merge;
 	std::function <void(A&, const APPLY_ARG&, int, int)> apply;
@@ -19,6 +19,7 @@ public:
 	Lazy_segtree(int _size,
 	const std::function <A(const A&, const A&)>& _merge,
 	const std::function <void(A&, const APPLY_ARG&, int, int)>& _apply) :
+	n_size(_size),
 	merge(_merge),
 	apply(_apply)
 	{
@@ -34,6 +35,7 @@ public:
 	template <typename B> Lazy_segtree(const std::vector <B>& u,
 	const std::function <A(const A&, const A&)>& _merge,
 	const std::function <void(A&, const APPLY_ARG&, int, int)>& _apply) :
+	n_size(u.size()),
 	merge(_merge),
 	apply(_apply)
 	{
@@ -49,6 +51,7 @@ public:
 	template <typename B> Lazy_segtree(int _size, const std::vector <B>& u,
 	const std::function <A(const A&, const A&)>& _merge,
 	const std::function <void(A&, const APPLY_ARG&, int, int)>& _apply) :
+	n_size(_size),
 	merge(_merge),
 	apply(_apply)
 	{
@@ -75,7 +78,7 @@ public:
 	}
 	
 	void update(const APPLY_ARG& arg) {
-		update(0, 0, size, arg);
+		update(0, n_size, arg);
 	}
 	
 	A query(int l, int r) {
@@ -84,8 +87,7 @@ public:
 	}
 	
 	A query() {
-		push(0, 0, size);
-		return v[0];
+		return query(0, n_size);
 	}
 	
 	int find_first(int l, int r, const std::function <bool(const A&)>& check) {
@@ -94,7 +96,7 @@ public:
 	}
 	
 	int find_first(const std::function <bool(const A&)>& check) {
-		return find_first(0, size, check);
+		return find_first(0, n_size, check);
 	}
 	
 	int find_last(int l, int r, const std::function <bool(const A&)>& check) {
@@ -103,7 +105,7 @@ public:
 	}
 	
 	int find_last(const std::function <bool(const A&)>& check) {
-		return find_last(0, size, check);
+		return find_last(0, n_size, check);
 	}
 	
 private:
