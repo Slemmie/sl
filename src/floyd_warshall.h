@@ -9,25 +9,49 @@ template <typename A> class Floyd_warshall {
 	
 public:
 	
+	struct Edge {
+		
+		int from, to;
+		A weight;
+		
+		Edge(int _from = -1, int _to = -1, A _weight = 0) :
+		from(_from),
+		to(_to),
+		weight(_weight)
+		{ }
+		
+		friend std::ostream& operator << (std::ostream& stream, const Edge& edge) {
+			stream << "{[" << edge.from << " -> " << edge.to << "]: (" << edge.weight << ")}";
+			return stream;
+		}
+		
+	};
+	
+	std::vector <Edge> edges;
 	std::vector <std::vector <A>> g;
 	std::vector <std::vector <bool>> bad;
 	int size;
 	A inf;
 	
 	Floyd_warshall(int _size, A _inf) :
-	g(_size, std::vector <A> (_size, _inf)),
-	bad(_size, std::vector <bool> (_size, false)),
 	size(_size),
 	inf(_inf)
-	{
+	{ }
+	
+	void reset() {
+		g = std::vector <std::vector <A>> (size, std::vector <A> (size, inf));
 		for (int i = 0; i < size; i++) {
 			g[i][i] = 0;
 		}
+		for (Edge& edge : edges) {
+			g[edge.from][edge.to] = std::min(g[edge.from][edge.to], edge.weight);
+		}
+		bad = std::vector <std::vector <bool>> (size, std::vector <bool> (size, false));
 	}
 	
 	inline void add(int from, int to, A weight = 1) {
 		assert(from >= 0 && from < size && to >= 0 && to < size);
-		g[from][to] = std::min(g[from][to], weight);
+		edges.emplace_back(from, to, weight);
 	}
 	
 	inline A dist(int from, int to) const {
@@ -40,6 +64,7 @@ public:
 	}
 	
 	void init(bool has_negative = true) {
+		reset();
 		for (int k = 0; k < size; k++) {
 			for (int i = 0; i < size; i++) {
 				for (int j = 0; j < size; j++) {
