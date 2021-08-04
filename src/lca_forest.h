@@ -25,7 +25,7 @@ public:
 	bin(_size)
 	{ }
 	
-	void make_lca() {
+	void init() {
 		if (par_node.empty()) {
 			dfs_all();
 		}
@@ -84,6 +84,10 @@ public:
 			u = bin[u][b];
 		}
 		return bin[u][0];
+	}
+	
+	inline A dist(int u, int v) {
+		return dep[u] + dep[v] - dep[lca(u, v)] * 2;
 	}
 	
 };
