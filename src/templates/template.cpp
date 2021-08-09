@@ -18,9 +18,6 @@ tree <A, null_type, B, rb_tree_tag, tree_order_statistics_node_update>;
 template <typename A, typename B, typename C = std::less <A>> using ordered_map =
 tree <A, B, C, rb_tree_tag, tree_order_statistics_node_update>;
 
-#include <sl/mint.h>
-#include <sl/debug.h>
-
 void prep();
 void solv(const int curt);
 
@@ -36,6 +33,8 @@ int main() {
 	
 	return 0;
 }
+
+#include <sl/debug.h>
 
 void prep() {
 	
