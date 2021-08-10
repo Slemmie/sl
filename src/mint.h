@@ -8,6 +8,8 @@
 constexpr int mod = 1000000007;
 //constexpr int mod = 998244353;
 
+constexpr bool prime_mod = true;
+
 template <typename A> A inverse(A a, A b) {
 	a %= b;
 	if (!a) {
@@ -67,6 +69,9 @@ struct Mint {
 		return ret;
 	}
 	friend Mint inv(const Mint& mint) {
+		if (prime_mod) {
+			return pow(mint, mod - 2);
+		}
 		return inverse(mint.value, mod);
 	}
 	Mint& operator /= (const Mint& oth) {
