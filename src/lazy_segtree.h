@@ -5,117 +5,109 @@
 
 //-//
 
-template <typename A, typename APPLY_ARG> class Lazy_segtree {
+template <typename node> class Lazy_segtree {
 	
 public:
 	
 	int size, n_size;
-	std::vector <A> v;
-	std::function <A(const A&, const A&)> merge;
-	std::function <void(A&, const APPLY_ARG&, int, int)> apply;
+	std::vector <node> v;
 	
-	void push(int now, int l, int r);
-	
-	Lazy_segtree(int _size,
-	const std::function <A(const A&, const A&)>& _merge,
-	const std::function <void(A&, const APPLY_ARG&, int, int)>& _apply) :
-	n_size(_size),
-	merge(_merge),
-	apply(_apply)
+	Lazy_segtree(int _size) :
+	n_size(_size)
 	{
 		assert(_size > 0);
 		size = 1;
 		while (size < _size) {
 			size <<= 1;
 		}
-		v.resize(size << 1, A { });
+		v.resize(size << 1, node { });
 		make();
 	}
 	
-	template <typename B> Lazy_segtree(const std::vector <B>& u,
-	const std::function <A(const A&, const A&)>& _merge,
-	const std::function <void(A&, const APPLY_ARG&, int, int)>& _apply) :
-	n_size(u.size()),
-	merge(_merge),
-	apply(_apply)
+	template <typename A> Lazy_segtree(const std::vector <A>& _v) :
+	n_size(_v.size())
 	{
-		assert(!u.empty());
+		assert(!_v.empty());
 		size = 1;
-		while (size < (int)u.size()) {
+		while (size < (int)_v.size()) {
 			size <<= 1;
 		}
-		v.resize(size << 1, A { });
-		make(u);
+		v.resize(size << 1, node { });
+		make(_v);
 	}
 	
-	template <typename B> Lazy_segtree(int _size, const std::vector <B>& u,
-	const std::function <A(const A&, const A&)>& _merge,
-	const std::function <void(A&, const APPLY_ARG&, int, int)>& _apply) :
-	n_size(_size),
-	merge(_merge),
-	apply(_apply)
+	template <typename A> Lazy_segtree(int _size, const std::vector <A>& _v) :
+	n_size(_size)
 	{
 		assert(_size > 0);
 		size = 1;
 		while (size < _size) {
 			size <<= 1;
 		}
-		v.resize(size << 1, A { });
-		make(u);
+		v.resize(size << 1, node { });
+		make(_v);
 	}
 	
 	void make() {
 		m_make(0, 0, size);
 	}
 	
-	template <typename B> void make(const std::vector <B>& u) {
-		m_make(u, 0, 0, size);
+	template <typename A> void make(const std::vector <A>& _v) {
+		m_make(_v, 0, 0, size);
 	}
 	
-	void update(int l, int r, const APPLY_ARG& arg) {
+	template <typename A> void update(int l, int r, const A& arg) {
 		assert(l >= 0 && l < r && r <= size);
 		m_update(l, r, 0, 0, size, arg);
 	}
 	
-	void update(const APPLY_ARG& arg) {
+	template <typename A> void update(const A& arg) {
 		update(0, n_size, arg);
 	}
 	
-	A query(int l, int r) {
+	node query(int l, int r) {
 		assert(l >= 0 && l < r && r <= size);
 		return m_query(l, r, 0, 0, size);
 	}
 	
-	A query() {
+	node query() {
 		return query(0, n_size);
 	}
 	
-	int find_first(int l, int r, const std::function <bool(const A&)>& check) {
+	int find_first(int l, int r, const std::function <bool(const node&)>& check) {
 		assert(l >= 0 && l < r && r <= size);
 		return m_find_first(l, r, 0, 0, size, check);
 	}
 	
-	int find_first(const std::function <bool(const A&)>& check) {
+	int find_first(const std::function <bool(const node&)>& check) {
 		return find_first(0, n_size, check);
 	}
 	
-	int find_last(int l, int r, const std::function <bool(const A&)>& check) {
+	int find_last(int l, int r, const std::function <bool(const node&)>& check) {
 		assert(l >= 0 && l < r && r <= size);
-		return m_find_last(l, r, 0, 0, size, check);
+		return m_find_lsat(l, r, 0, 0, size, check);
 	}
 	
-	int find_last(const std::function <bool(const A&)>& check) {
+	int find_last(const std::function <bool(const node&)>& check) {
 		return find_last(0, n_size, check);
 	}
 	
 private:
 	
-	int m_mid(int l, int r) {
+	inline int m_mid(int l, int r) {
 		return (l + r) >> 1;
 	}
 	
-	bool m_outside(int l, int r, int tl, int tr) {
+	inline bool m_outside(int l, int r, int tl, int tr) {
 		return l >= tr || r <= tl;
+	}
+	
+	inline node* m_child(int ind, int l, int r) {
+		return r - l - 1 ? &v[ind] : nullptr;
+	}
+	
+	inline void m_push(int now, int l, int r) {
+		v[now].push(m_child((now << 1) + 1, l, r), m_child((now << 1) + 2, l, r), l, r);
 	}
 	
 	void m_make(int now, int l, int r) {
@@ -125,53 +117,54 @@ private:
 		int mid = m_mid(l, r);
 		m_make((now << 1) + 1, l, mid);
 		m_make((now << 1) + 2, mid, r);
-		v[now] = merge(v[(now << 1) + 1], v[(now << 1) + 2]);
+		v[now] = node::merge(v[(now << 1) + 1], v[(now << 1) + 2]);
 	}
 	
-	template <typename B> void m_make(const std::vector <B>& u, int now, int l, int r) {
+	template <typename A> void m_make(const std::vector <A>& _v, int now, int l, int r) {
 		if (!(r - l - 1)) {
-			if (l < (int)u.size()) {
-				apply(v[now], APPLY_ARG(u[l]), l, r);
-				push(now, l, r);
+			if (l < (int)_v.size()) {
+				v[now].apply(_v[l], l, r);
+				m_push(now, l, r);
 			}
 			return;
 		}
 		int mid = m_mid(l, r);
-		m_make(u, (now << 1) + 1, l, mid);
-		m_make(u, (now << 1) + 2, mid, r);
-		v[now] = merge(v[(now << 1) + 1], v[(now << 1) + 2]);
+		m_make(_v, (now << 1) + 1, l, mid);
+		m_make(_v, (now << 1) + 2, mid, r);
+		v[now] = node::merge(v[(now << 1) + 1], v[(now << 1) + 2]);
+		
 	}
 	
-	void m_update(int tl, int tr, int now, int l, int r, const APPLY_ARG& arg) {
-		push(now, l, r);
+	template <typename A> void m_update(int tl, int tr, int now, int l, int r, const A& arg) {
+		m_push(now, l, r);
 		if (l >= tr || r <= tl) {
 			return;
 		}
 		if (l >= tl && r <= tr) {
-			apply(v[now], arg, l, r);
-			push(now, l, r);
+			v[now].apply(arg, l, r);
+			m_push(now, l, r);
 			return;
 		}
 		int mid = m_mid(l, r);
 		m_update(tl, tr, (now << 1) + 1, l, mid, arg);
 		m_update(tl, tr, (now << 1) + 2, mid, r, arg);
-		v[now] = merge(v[(now << 1) + 1], v[(now << 1) + 2]);
+		v[now] = node::merge(v[(now << 1) + 1], v[(now << 1) + 2]);
 	}
 	
-	A m_query(int tl, int tr, int now, int l, int r) {
-		push(now, l, r);
+	node m_query(int tl, int tr, int now, int l, int r) {
+		m_push(now, l, r);
 		if (l >= tl && r <= tr) {
 			return v[now];
 		}
 		int mid = m_mid(l, r);
-		A ret { };
+		node ret = node { };
 		if (m_outside(l, mid, tl, tr)) {
 			ret = m_query(tl, tr, (now << 1) + 2, mid, r);
 		} else {
 			if (m_outside(mid, r, tl, tr)) {
 				ret = m_query(tl, tr, (now << 1) + 1, l, mid);
 			} else {
-				ret = merge(
+				ret = node::merge(
 				m_query(tl, tr, (now << 1) + 1, l, mid),
 				m_query(tl, tr, (now << 1) + 2, mid, r));
 			}
@@ -180,13 +173,13 @@ private:
 	}
 	
 	int m_find_first_exists(int now, int l, int r,
-	const std::function <bool(const A&)>& check) {
-		push(now, l, r);
+	const std::function <bool(const node&)>& check) {
+		m_push(now, l, r);
 		if (!(r - l - 1)) {
 			return l;
 		}
 		int mid = m_mid(l, r);
-		push((now << 1) + 1, l, mid);
+		m_push((now << 1), l, mid);
 		if (check(v[(now << 1) + 1])) {
 			return m_find_first_exists((now << 1) + 1, l, mid, check);
 		}
@@ -194,8 +187,8 @@ private:
 	}
 	
 	int m_find_first(int tl, int tr, int now, int l, int r,
-	const std::function <bool(const A&)>& check) {
-		push(now, l, r);
+	const std::function <bool(const node&)>& check) {
+		m_push(now, l, r);
 		if (l >= tl && r <= tr) {
 			if (!check(v[now])) {
 				return -1;
@@ -203,33 +196,32 @@ private:
 			return m_find_first_exists(now, l, r, check);
 		}
 		int mid = m_mid(l, r);
-		int ret = -1;
 		if (!m_outside(l, mid, tl, tr)) {
-			ret = m_find_first(tl, tr, (now << 1) + 1, l, mid, check);
+			return m_find_first(tl, tr, (now << 1) + 1, l, mid, check);
 		}
-		if (!m_outside(mid, r, tl, tr) && ret == -1) {
-			ret = m_find_first(tl, tr, (now << 1) + 2, mid, r, check);
+		if (!m_outside(mid, r, tl, tr)) {
+			return m_find_first(tl, tr, (now << 1) + 2, mid, r, check);
 		}
-		return ret;
+		return -1;
 	}
 	
 	int m_find_last_exists(int now, int l, int r,
-	const std::function <bool(const A&)>& check) {
-		push(now, l, r);
+	const std::function <bool(const node&)>& check) {
+		v[now].push(m_child((now << 1) + 1, l, r), m_child((now << 1) + 2, l, r), l, r);
 		if (!(r - l - 1)) {
 			return l;
 		}
 		int mid = m_mid(l, r);
-		push((now << 1) + 2, mid, r);
-		if (check(v[(now << 1) + 2])) {
+		m_push((now << 1) + 2, mid, r);
+		if (check(v[(now << 1) +2 ])) {
 			return m_find_last_exists((now << 1) + 2, mid, r, check);
 		}
 		return m_find_last_exists((now << 1) + 1, l, mid, check);
 	}
 	
 	int m_find_last(int tl, int tr, int now, int l, int r,
-	const std::function <bool(const A&)>& check) {
-		push(now, l, r);
+	const std::function <bool(const node&)>& check) {
+		m_push(now, l, r);
 		if (l >= tl && r <= tr) {
 			if (!check(v[now])) {
 				return -1;
@@ -237,14 +229,13 @@ private:
 			return m_find_last_exists(now, l, r, check);
 		}
 		int mid = m_mid(l, r);
-		int ret = -1;
 		if (!m_outside(mid, r, tl, tr)) {
-			ret = m_find_last(tl, tr, (now << 1) + 2, mid, r, check);
+			return m_find_last(tl, tr, (now << 1) + 2, mid, r, check);
 		}
-		if (!m_outside(l, mid, tl, tr) && ret == -1) {
-			ret = m_find_last(tl, tr, (now << 1) + 1, l, mid, check);
+		if (!m_outside(l, mid, tl, tr)) {
+			return m_find_last(tl, tr, (now << 1) + 1, l, mid, check);
 		}
-		return ret;
+		return -1;
 	}
 	
 };
