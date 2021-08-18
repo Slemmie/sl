@@ -84,7 +84,7 @@ public:
 		return res;
 	}
 	
-	inline int lv_suffix(int l1, int r1, int l2, int r2) {
+	inline int lc_suffix(int l1, int r1, int l2, int r2) {
 		assert(l1 >= 0 && l1 <= r1 && r1 < size);
 		assert(l2 >= 0 && l2 <= r2 && r2 < size);
 		int l = 1, r = std::min(r1 - l1, r2 - l2), res = 0;
