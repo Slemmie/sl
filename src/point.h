@@ -27,6 +27,12 @@ public:
 	bool operator >= (const Point& oth) const {
 		return std::tie(x, y) >= std::tie(oth.x, oth.y);
 	}
+	bool operator == (const Point& oth) const {
+		return std::tie(x, y) == std::tie(oth.x, oth.y);
+	}
+	bool operator != (const Point& oth) const {
+		return !((*this) == oth);
+	}
 	Point operator - () const {
 		return Point(-x, -y);
 	}
