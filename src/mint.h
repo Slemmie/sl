@@ -23,7 +23,7 @@ template <typename A> A inverse(A a, A b) {
 struct Mint {
 	int value;
 	explicit operator int() const { return value; }
-	Mint(int _value = 0) : value(_value) { }
+	Mint(int _value = 0) : value(_value < mod ? _value : _value % mod) { }
 	template <typename B = int> Mint(const B& _value) {
 		long long llvalue = _value;
 		value = (-mod <= llvalue && llvalue <= mod) ? llvalue : llvalue % mod;
