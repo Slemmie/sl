@@ -72,7 +72,7 @@ public:
 		return x * oth.x + y * oth.y;
 	}
 	A cross(const Point& oth) const {
-		return x * oth.x - y * oth.y;
+		return x * oth.y - y * oth.x;
 	}
 	A cross(const Point& a, const Point& b) const {
 		return (a - (*this)).cross(b - (*this));
