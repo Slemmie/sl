@@ -25,11 +25,6 @@ struct Diff {
 		std::stringstream stream;
 		stream << "> [" << line << ":" << col << "]:";
 		for (int f = 0; f < (int)files.size(); f++) {
-			if (files[f][line].empty()) {
-				ss[f] << "\033[31m" << "'-empty-'" << "\033[0m";
-				stream << "\n" << ss[f].str();
-				continue;
-			}
 			ss[f] << "    ";
 			int name_ptr = 0;
 			for (; name_ptr < std::min(6, (int)file_names[f].length()); name_ptr++) {
@@ -39,13 +34,23 @@ struct Diff {
 				ss[f] << ".";
 			}
 			ss[f] << ": '";
+			if (line >= (int)files[f].size()) {
+				ss[f] << "\033[31m" << "eof" << "\033[0m'";
+				stream << "\n" << ss[f].str();
+				continue;
+			}
+			if (files[f][line].empty()) {
+				ss[f] << "\033[31m" << "-empty-" << "\033[0m'";
+				stream << "\n" << ss[f].str();
+				continue;
+			}
 			ss[f] << "\033[90m" << "..." << "\033[0m";
 			assert(col < (int)files[f][line].length());
 			for (int i = std::max(0, col - 5); i < col; i++) {
 				ss[f] << files[f][line][i];
 			}
 			std::string diff;
-			for (int i = col; i < std::min(col + 25, (int)files[f][line].length()); i++) {
+			for (int i = std::max(0, col); i < std::min(col + 25, (int)files[f][line].length()); i++) {
 				ss[f] << "\033[31m" << files[f][line][i] << "\033[0m";
 			}
 			ss[f] << "\033[90m" << "..." << "\033[0m";
@@ -84,6 +89,11 @@ void find_diffs() {
 			bool is_diff = false;
 			std::set <char> st;
 			for (int f = 0; f < (int)files.size(); f++) {
+				if (line >= (int)files[f].size()) {
+					is_diff = true;
+					col = -1;
+					break;
+				}
 				if (col >= (int)files[f][line].length()) {
 					is_diff = true;
 					break;
