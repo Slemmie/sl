@@ -35,17 +35,17 @@ struct Diff {
 			}
 			ss[f] << ": '";
 			if (line >= (int)files[f].size()) {
-				ss[f] << "\033[31m" << "eof" << "\033[0m'";
+				ss[f] << "\033[31;1m" << "eof" << "\033[0m'";
 				stream << "\n" << ss[f].str();
 				continue;
 			}
 			if (files[f][line].empty()) {
-				ss[f] << "\033[31m" << "-empty-" << "\033[0m'";
+				ss[f] << "\033[31;1m" << "eol" << "\033[0m'";
 				stream << "\n" << ss[f].str();
 				continue;
 			}
 			ss[f] << "\033[90m" << "..." << "\033[0m";
-			assert(col < (int)files[f][line].length());
+			assert(col <= (int)files[f][line].length());
 			for (int i = std::max(0, col - 5); i < col; i++) {
 				ss[f] << files[f][line][i];
 			}
@@ -53,7 +53,11 @@ struct Diff {
 			for (int i = std::max(0, col); i < std::min(col + 25, (int)files[f][line].length()); i++) {
 				ss[f] << "\033[31m" << files[f][line][i] << "\033[0m";
 			}
-			ss[f] << "\033[90m" << "..." << "\033[0m";
+			if (col == (int)files[f][line].length()) {
+				ss[f] << "\033[31;1m" << "eol" << "\033[0m'";
+			} else {
+				ss[f] << "\033[90m" << "..." << "\033[0m";
+			}
 			ss[f] << "'";
 			stream << "\n" << ss[f].str();
 		}
