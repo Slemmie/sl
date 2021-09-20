@@ -10,7 +10,7 @@ public:
 	
 	std::vector <std::vector <int>> inverse;
 	Topo_sort topo;
-	std::vector <int> col;
+	std::vector <int> col, head;
 	int size;
 	int amount;
 	
@@ -21,14 +21,19 @@ public:
 	amount(0)
 	{ }
 	
-	void add(int from, int to) {
+	inline void add(int from, int to) {
 		assert(from >= 0 && from < size && to >= 0 && to < size);
 		inverse[to].push_back(from);
 		topo.add(from, to);
 	}
 	
-	void reset() {
+	inline int root(int col) {
+		return head[col];
+	}
+	
+	inline void reset() {
 		col = std::vector <int> (size, -1);
+		head.clear();
 		amount = 0;
 	}
 	
@@ -37,6 +42,7 @@ public:
 		topo.init();
 		for (int i = size - 1; i >= 0; i--) {
 			if (col[topo[i]] == -1) {
+				head.push_back(topo[i]);
 				m_dfs(topo[i], amount++);
 			}
 		}
