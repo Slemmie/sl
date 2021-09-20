@@ -56,13 +56,13 @@ public:
 		m_make(_v, 0, 0, size);
 	}
 	
-	template <typename A> void update(int l, int r, const A& arg) {
+	template <typename... A> void update(int l, int r, const A&... arg) {
 		assert(l >= 0 && l < r && r <= size);
-		m_update(l, r, 0, 0, size, arg);
+		m_update(l, r, 0, 0, size, arg...);
 	}
 	
-	template <typename A> void update(const A& arg) {
-		update(0, n_size, arg);
+	template <typename... A> void update(const A&... arg) {
+		update(0, n_size, arg...);
 	}
 	
 	node query(int l, int r) {
@@ -135,19 +135,19 @@ private:
 		
 	}
 	
-	template <typename A> void m_update(int tl, int tr, int now, int l, int r, const A& arg) {
+	template <typename... A> void m_update(int tl, int tr, int now, int l, int r, const A&... arg) {
 		m_push(now, l, r);
 		if (l >= tr || r <= tl) {
 			return;
 		}
 		if (l >= tl && r <= tr) {
-			v[now].apply(arg, l, r);
+			v[now].apply(arg..., l, r);
 			m_push(now, l, r);
 			return;
 		}
 		int mid = m_mid(l, r);
-		m_update(tl, tr, (now << 1) + 1, l, mid, arg);
-		m_update(tl, tr, (now << 1) + 2, mid, r, arg);
+		m_update(tl, tr, (now << 1) + 1, l, mid, arg...);
+		m_update(tl, tr, (now << 1) + 2, mid, r, arg...);
 		v[now] = node::merge(v[(now << 1) + 1], v[(now << 1) + 2]);
 	}
 	

@@ -56,9 +56,9 @@ public:
 		m_make(_v, 0, 0, size);
 	}
 	
-	template <typename A> void update(int ind, const A& arg) {
+	template <typename... A> void update(int ind, const A&... arg) {
 		assert(ind >= 0 && ind < size);
-		m_update(ind, 0, 0, size, arg);
+		m_update(ind, 0, 0, size, arg...);
 	}
 	
 	node query(int l, int r) {
@@ -121,16 +121,16 @@ private:
 		v[now] = node::merge(v[(now << 1) + 1], v[(now << 1) + 2]);
 	}
 	
-	template <typename A> void m_update(int ind, int now, int l, int r, const A& arg) {
+	template <typename... A> void m_update(int ind, int now, int l, int r, const A&... arg) {
 		if (!(r - l - 1)) {
-			v[now].apply(arg);
+			v[now].apply(arg...);
 			return;
 		}
 		int mid = m_mid(l, r);
 		if (ind < mid) {
-			m_update(ind, (now << 1) + 1, l, mid, arg);
+			m_update(ind, (now << 1) + 1, l, mid, arg...);
 		} else {
-			m_update(ind, (now << 1) + 2, mid, r, arg);
+			m_update(ind, (now << 1) + 2, mid, r, arg...);
 		}
 		v[now] = node::merge(v[(now << 1) + 1], v[(now << 1) + 2]);
 	}
