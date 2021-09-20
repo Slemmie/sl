@@ -18,6 +18,7 @@ struct Twosat {
 	{ }
 	
 	inline void add(int from, int to) {
+		assert(from >= 0 && from < (size << 1) && to >= 0 && to < (size << 1));
 		g[from].push_back(to);
 	}
 	
