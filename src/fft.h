@@ -35,7 +35,7 @@ public:
 		return std::vector <A> (result.begin(), result.begin() + p1.size() + p2.size() - 1);
 	}
 	
-	static std::vector <cpx> fft(const std::vector <cpx>& p, double inverse = false) {
+	static std::vector <cpx> fft(const std::vector <cpx>& p, bool inverse = false) {
 		int n = p.size();
 		if (n == 1) {
 			return std::vector <cpx> (p.begin(), p.end());
