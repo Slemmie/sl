@@ -10,13 +10,13 @@ public:
 	
 	struct Eq {
 		
-		mutable ll k, m, p;
+		mutable long long k, m, p;
 		
 		bool operator < (const Eq& oth) const {
 			return k < oth.k;
 		}
 		
-		bool operator < (ll oth) const {
+		bool operator < (long long oth) const {
 			return p < oth;
 		}
 		
@@ -24,7 +24,7 @@ public:
 	
 	std::multiset <Eq, std::less <>> st;
 	
-	void push(ll k, ll m) {
+	void push(long long k, long long m) {
 		auto it3 = st.insert({ k, m, 0 });
 		auto it2 = it3++;
 		auto it1 = it2;
@@ -43,16 +43,16 @@ public:
 		}
 	}
 	
-	ll query(ll x) {
+	long long query(long long x) {
 		auto it = st.lower_bound(x);
 		return it->k * x + it->m;
 	}
 	
 private:
 	
-	static inline const ll m_inf = 1LL << 60;
+	static inline const long long m_inf = 1LL << 60;
 	
-	ll m_fdiv(ll a, ll b) {
+	long long m_fdiv(long long a, long long b) {
 		return a / b - ((a ^ b) < 0 && a % b);
 	}
 	
