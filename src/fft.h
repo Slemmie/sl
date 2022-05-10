@@ -5,62 +5,74 @@
 
 //-//
 
-typedef std::complex <double> cpx;
-
-class FFT {
+namespace FFT {
 	
-public:
-	
-	template <typename A> static std::vector <A> mul_pol(const std::vector <A>& p1, const std::vector <A>& p2) {
-		std::vector <std::vector <cpx>> p = {
-			{ p1.begin(), p1.end() },
-			{ p2.begin(), p2.end() }
-		};
-		int n = 1;
-		while (n < int(p[0].size() + p[1].size())) {
-			n <<= 1;
-		}
-		p[0].resize(n);
-		p[0] = fft(p[0]);
-		p[1].resize(n);
-		p[1] = fft(p[1]);
-		for (int i = 0; i < n; i++) {
-			p[0][i] *= p[1][i];
-		}
-		p[0] = fft(p[0], true);
-		std::vector <A> result(n);
-		for (int i = 0; i < n; i++) {
-			result[i] = round(p[0][i].real());
-		}
-		return std::vector <A> (result.begin(), result.begin() + p1.size() + p2.size() - 1);
-	}
-	
-	static std::vector <cpx> fft(const std::vector <cpx>& p, bool inverse = false) {
-		int n = p.size();
-		if (n == 1) {
-			return std::vector <cpx> (p.begin(), p.end());
-		}
-		std::vector <std::vector <cpx>> q(2, std::vector <cpx> (n >> 1));
-		for (int i = 0; i < (n >> 1); i++) {
-			q[0][i] = p[i << 1];
-			q[1][i] = p[(i << 1) + 1];
-		}
-		q[0] = fft(q[0], inverse);
-		q[1] = fft(q[1], inverse);
-		static const double s_pi = std::acos(-1);
-		double angle = 2.0 * s_pi / n * (inverse ? -1 : 1);
-		cpx w(1), wn(std::cos(angle), std::sin(angle));
-		std::vector <cpx> result(n);
-		for (int i = 0; i < (n >> 1); i++) {
-			result[i] = q[0][i] + w * q[1][i];
-			result[i + (n >> 1)] = q[0][i] - w * q[1][i];
-			if (inverse) {
-				result[i] /= 2;
-				result[i + (n >> 1)] /= 2;
-			}
-			w *= wn;
-		}
-		return result;
-	}
+	void fft(std::vector <std::complex <double>>& input) {
+		const int size = input.size();
 		
+		static std::vector <std::complex <double>> roots(size, 1);
+		for (static int i = 2; i < size; i <<= 1) {
+			static constexpr double pi = std::acos(-1.0);
+			std::complex <double> angle = std::polar(1.0, pi / (double) i);
+			roots.resize(i << 1);
+			for (int j = i; j < (i << 1); j++) {
+				roots[j] = roots[j >> 1] * ((j & 1) ? angle : 1.0);
+			}
+		}
+		
+		const int leading = 31 - __builtin_clz(size);
+		
+		std::vector <int> reverse(size, 0);
+		for (int i = 0; i < size; i++) {
+			reverse[i] = (reverse[i >> 1] | ((i & 1) << leading)) >> 1;
+		}
+		
+		for (int i = 0; i < size; i++) {
+			if (i < reverse[i]) {
+				std::swap(input[i], input[reverse[i]]);
+			}
+		}
+		
+		for (int i = 1; i < size; i <<= 1) {
+			for (int j = 0; j < size; j += (i << 1)) {
+				for (int k = 0; k < i; k++) {
+					std::complex <double> delta = roots[i + k] * input[i + j + k];
+					input[i + j + k] = input[j + k] - delta;
+					input[j + k] += delta;
+				}
+			}
+		}
+	}
+	 
+	std::vector <long long> conv(const std::vector <int>& u, const std::vector <int>& v) {
+		const int size = 1 << (32 - __builtin_clz(u.size() + v.size() - 1));
+		
+		std::vector <std::complex <double>> a(size), b(size);
+		for (int i = 0; i < (int) u.size(); i++) {
+			a[i].real(u[i]);
+		}
+		for (int i = 0; i < (int) v.size(); i++) {
+			a[i].imag(v[i]);
+		}
+		
+		fft(a);
+		
+		for (int i = 0; i < size; i++) {
+			a[i] *= a[i];
+		}
+		
+		for (int i = 0; i < size; i++) {
+			b[i] = a[-i & (size - 1)] - std::conj(a[i]);
+		}
+		
+		fft(b);
+		
+		std::vector <long long> res(u.size() + v.size() - 1);
+		for (int i = 0; i < (int) res.size(); i++) {
+			res[i] = std::round(b[i].imag() / (size << 2));
+		}
+		
+		return res;
+	}
+	
 };
