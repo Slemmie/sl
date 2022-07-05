@@ -135,4 +135,6 @@ int main(int argc, char** argv) {
 		d.print();
 	}
 	
+	return 1;
+	
 }
